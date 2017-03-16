@@ -25,7 +25,7 @@ namespace DinnerBot
 			if (activity.Type == ActivityTypes.Message)
 			{
 				// simplify the code
-				await Conversation.SendAsync(activity, () => new Dialogs.GreetingDialog()
+				await Conversation.SendAsync(activity, () =>  Dialogs.DinnerReservationDialog.dialog
 				);
 			}
 			else

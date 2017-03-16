@@ -18,7 +18,20 @@ namespace DinnerBot.Dialogs
 			// now suspend the current dialog and wait for more dialog from the user.
 			context.Wait(IncomingMessageAsync);
 		}
-
+		private static async Task Respond(IDialogContext context)
+		{
+			var userName = String.Empty;
+			context.UserData.TryGetValue<string>("UserName", out userName);
+			if (string.IsNullOrEmpty(userName))
+			{
+				await context.PostAsync("Tell me your name?");
+				context.UserData.SetValue<bool>("readyToGetUserName", true);
+			}
+			else
+			{
+				await context.PostAsync($"Hello {userName}. Let's get started.");
+			}
+		}
 		public virtual async Task IncomingMessageAsync(IDialogContext context, IAwaitable<IMessageActivity> currentActivity)
 		{
 			var message = await currentActivity;
@@ -33,20 +46,12 @@ namespace DinnerBot.Dialogs
 				context.UserData.SetValue<string>("UserName", userName);
 				context.UserData.SetValue<Boolean>("Ready", false);
 			}
-			if (string.IsNullOrEmpty(userName))
-			{
-				await context.PostAsync("Tell me your name.");
-				context.UserData.SetValue<Boolean>("Ready", true);
 
-			}
-			else
-			{
-					await context.PostAsync($"Hello {userName}. Let's get started.");
-			}
 
-			// the dialog always need to go somewhee.
-			// in this simple dialog, we loop back and call ourselve.
-			context.Wait(IncomingMessageAsync);
+
+			// change this part
+			await Respond(context);
+			context.Done(message);
 
 		}
 	}
