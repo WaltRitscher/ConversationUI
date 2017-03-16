@@ -19,14 +19,26 @@ namespace DinnerBot
 		/// </summary>
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 		{
+			ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+			string replyString = "";
 			if (activity.Type == ActivityTypes.Message)
 			{
-				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+				
 				// calculate something for us to return
-				int length = (activity.Text ?? string.Empty).Length;
+				if (activity.Text.ToUpper() == "HI")
+				{
+					replyString = "Welcome.  Can I find you a table for dinner at a nearby restaurant?";
+				}
+				else
+				{
 
+					int length = (activity.Text ?? string.Empty).Length;
+					replyString = $"You sent {activity.Text} which was {length} characters";
+				}
+				
+			
 				// return our reply to the user
-				Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
+				Activity reply = activity.CreateReply(replyString);
 				await connector.Conversations.ReplyToActivityAsync(reply);
 			}
 			else
