@@ -7,6 +7,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace DinnerBot
 {
@@ -20,26 +21,12 @@ namespace DinnerBot
 		public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
 		{
 			ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-			string replyString = "";
+			
 			if (activity.Type == ActivityTypes.Message)
 			{
-				
-				// calculate something for us to return
-				if (activity.Text.ToUpper() == "HI")
-				{
-					replyString = "Welcome.  Can I find you a table for dinner at a nearby restaurant?";
-				}
-				else
-				{
-
-					int length = (activity.Text ?? string.Empty).Length;
-					replyString = $"You sent {activity.Text} which was {length} characters";
-				}
-				
-			
-				// return our reply to the user
-				Activity reply = activity.CreateReply(replyString);
-				await connector.Conversations.ReplyToActivityAsync(reply);
+				// simplify the code
+				await Conversation.SendAsync(activity, () => new Dialogs.GreetingDialog()
+				);
 			}
 			else
 			{
