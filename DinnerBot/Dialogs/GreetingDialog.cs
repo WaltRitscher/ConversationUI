@@ -14,7 +14,7 @@ namespace DinnerBot.Dialogs
 		public async Task StartAsync(IDialogContext context)
 		{
 			// The start of the code that represents the conversational dialog.
-			await context.PostAsync("Welcome to the Dinner Bot. ");
+			await context.PostAsync("Welcome to the Dinner Bot.");
 			// now suspend the current dialog and wait for more dialog from the user.
 			context.Wait(IncomingMessageAsync);
 		}
@@ -45,7 +45,7 @@ namespace DinnerBot.Dialogs
 			}
 
 			// the dialog always need to go somewhee.
-			// in this simple dialog, we loop back and call ourselve.
+			// in this simple dialog, we loop back and call ourself.
 			context.Wait(IncomingMessageAsync);
 
 		}
