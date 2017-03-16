@@ -23,13 +23,21 @@ namespace DinnerBot.Dialogs
 		{
 			var message = await currentActivity;
 			var userName = "";
+			var readyToGetUserName = false;
 
 			context.UserData.TryGetValue<string>("UserName", out userName);
+			context.UserData.TryGetValue<Boolean>("Ready", out readyToGetUserName);
+			if (readyToGetUserName)
+			{
+				userName = message.Text;
+				context.UserData.SetValue<string>("UserName", userName);
+				context.UserData.SetValue<Boolean>("Ready", false);
+			}
 			if (string.IsNullOrEmpty(userName))
 			{
 				await context.PostAsync("Tell me your name.");
-				userName = message.Text;
-				context.UserData.SetValue<string>("UserName", userName);
+				context.UserData.SetValue<Boolean>("Ready", true);
+
 			}
 			else
 			{
