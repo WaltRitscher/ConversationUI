@@ -1,34 +1,39 @@
-﻿using System.Threading.Tasks;
-using System.Web.Http;
-
-using Microsoft.Bot.Connector;
-using Microsoft.Bot.Builder.Dialogs;
-using System.Web.Http.Description;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Description;
+using Microsoft.Bot.Connector;
+using Newtonsoft.Json;
+using Microsoft.Bot.Builder.Dialogs;
 
-namespace DinnerBot.SimpleEchoBot
+namespace DinnerBot
 {
   [BotAuthentication]
-  public class MessagesController : ApiController
+  public class DinnerController : ApiController
   {
     /// <summary>
     /// POST: api/Messages
-    /// receive a message from a user and send replies
+    /// Receive a message from a user and reply to it
     /// </summary>
-    /// <param name="activity"></param>
-    [ResponseType(typeof(void))]
-    public virtual async Task<HttpResponseMessage> Post([FromBody] Activity activity)
+    public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
     {
-      // check if activity is of type message
-      if (activity != null && activity.GetActivityType() == ActivityTypes.Message)
+      ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+      if (activity != null && activity.Type == ActivityTypes.Message)
       {
-        await Conversation.SendAsync(activity, () => new EchoDialog());
+        // simplify the code
+        await Conversation.SendAsync(activity, () => new Dialogs.GreetingDialog()
+        );
       }
       else
       {
         HandleSystemMessage(activity);
       }
-      return new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
+      var response = Request.CreateResponse(HttpStatusCode.OK);
+      return response;
     }
 
     private Activity HandleSystemMessage(Activity message)
@@ -51,7 +56,7 @@ namespace DinnerBot.SimpleEchoBot
       }
       else if (message.Type == ActivityTypes.Typing)
       {
-        // Handle knowing tha the user is typing
+        // Handle knowing that the user is typing
       }
       else if (message.Type == ActivityTypes.Ping)
       {
